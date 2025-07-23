@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
+import random
 
 # ===== API Key =====
-SPOONACULAR_API_KEY ="API_KEY"
+SPOONACULAR_API_KEY = "e6cf5cb8b84b49ecbe59feed47e7dc8c"
 
 # ===== Macaron Gradient Background =====
 def set_background_macaron_gradient():
@@ -80,13 +81,11 @@ def get_dummy_restaurants(craving, location):
             return dummy_data[key]
     return [{"name": "Local Bites", "address": f"Center St, {location}", "rating": 4.0}]
 
-# ===== App Config =====
+# ===== Page Setup =====
 st.set_page_config(page_title="What To Eat App", page_icon="🍽", layout="centered")
-
-# ===== Set Background =====
 set_background_macaron_gradient()
 
-# ===== Title Section =====
+# ===== Header =====
 st.markdown("""
     <div class='text-box'>
         <h1 style='text-align: center;'>🍽 What Should I Eat?</h1>
@@ -94,18 +93,35 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# ===== Craving Options =====
+craving_options = ["Pizza", "Sushi", "Burger", "Pasta", "Salad", "Ramen", "Tacos", "Fried Chicken", "Dumplings", "Noodles"]
+
+# ===== Initialize session_state craving input =====
+if "craving_input" not in st.session_state:
+    st.session_state.craving_input = ""
+
 # ===== Input Form =====
 st.markdown("<div class='text-box'><h2>🔎 Enter Your Details</h2>", unsafe_allow_html=True)
-with st.form("user_inputs"):
+with st.form("user_inputs", clear_on_submit=False):
     location = st.text_input("📍 Your Location")
     budget = st.number_input("💰 Your Budget", min_value=1)
     currency = st.text_input("💱 Your Currency Symbol (e.g., $, €, ₹, RM)", value="$")
-    craving = st.text_input("😋 What are you craving?")
+    
+    # Craving Input with Random Button
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        craving = st.text_input("😋 What are you craving?", value=st.session_state.craving_input)
+    with col2:
+        random_clicked = st.form_submit_button("🎲 Random")
+        if random_clicked:
+            st.session_state.craving_input = random.choice(craving_options)
+            craving = st.session_state.craving_input  # update field value
+    
     calories = st.number_input("🔥 Max Calories", min_value=100, max_value=2000, step=50)
     submitted = st.form_submit_button("🔍 Find Foods")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ===== After Search =====
+# ===== Search Result Handling =====
 if submitted:
     st.markdown("<div class='text-box'>", unsafe_allow_html=True)
     st.info("🔎 Searching for food options...")
@@ -116,7 +132,7 @@ if submitted:
         st.markdown("### 🧑‍🍳 Recipe Suggestions")
         found = False
         for food in food_results:
-            estimated_price = 10.00  # Example estimate
+            estimated_price = 10.00  # You can add price logic later
             if estimated_price <= budget:
                 found = True
                 st.markdown("<div class='text-box'>", unsafe_allow_html=True)
