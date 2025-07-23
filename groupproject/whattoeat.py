@@ -3,7 +3,7 @@ import requests
 import random
 
 # ===== API Key =====
-SPOONACULAR_API_KEY = st.secrets["api"]["spoonacular_key"]
+SPOONACULAR_API_KEY = st.secrets["api"]["api_key"]
 
 # ===== Macaron Gradient Background =====
 def set_background_macaron_gradient():
